@@ -22,19 +22,20 @@ import (
 )
 
 const (
-	roleOwner           = "cluster-owner"
-	roleMember          = "cluster-member"
-	roleProjectOwner    = "project-owner"
-	roleProjectMember   = "project-member"
-	roleProjectReadOnly = "read-only"
-	restrictedAdmin     = "restricted-admin"
-	standardUser        = "user"
-	pssRestrictedPolicy = "restricted"
-	pssBaselinePolicy   = "baseline"
-	pssPrivilegedPolicy = "privileged"
-	psaWarn             = "pod-security.kubernetes.io/warn"
-	psaAudit            = "pod-security.kubernetes.io/audit"
-	psaEnforce          = "pod-security.kubernetes.io/enforce"
+	roleOwner                = "cluster-owner"
+	roleMember               = "cluster-member"
+	roleProjectOwner         = "project-owner"
+	roleProjectMember        = "project-member"
+	roleProjectReadOnly      = "read-only"
+	roleManageProjectMember = "projectroletemplatebindings-manage"
+	restrictedAdmin          = "restricted-admin"
+	standardUser             = "user"
+	pssRestrictedPolicy      = "restricted"
+	pssBaselinePolicy        = "baseline"
+	pssPrivilegedPolicy      = "privileged"
+	psaWarn                  = "pod-security.kubernetes.io/warn"
+	psaAudit                 = "pod-security.kubernetes.io/audit"
+	psaEnforce               = "pod-security.kubernetes.io/enforce"
 )
 
 func createUser(client *rancher.Client, role string) (*management.User, error) {
