@@ -18,7 +18,8 @@ func addCattleGlobalNamespaces(ctx context.Context, k8s kubernetes.Interface) er
 		if apierrors.IsNotFound(err) {
 			_, err = k8s.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: fleetconst.ClustersLocalNamespace,
+					Name:   fleetconst.ClustersLocalNamespace,
+					Labels: map[string]string{"app.kubernetes.io/managed-by": "rancher"},
 				},
 			}, metav1.CreateOptions{})
 		}
@@ -30,7 +31,8 @@ func addCattleGlobalNamespaces(ctx context.Context, k8s kubernetes.Interface) er
 	if apierrors.IsNotFound(err) {
 		_, err = k8s.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: namespace.System,
+				Name:   namespace.System,
+				Labels: map[string]string{"app.kubernetes.io/managed-by": "rancher"},
 			},
 		}, metav1.CreateOptions{})
 	}
