@@ -519,6 +519,24 @@ func (s Setting) Get() string {
 	return provider.Get(s.Name)
 }
 
+// GetBool will return the currently stored value of the setting as a boolean
+// If the stored value is not a boolean then the default value will be returned as a boolean.
+// If the default value is not a boolean then the function will return false.
+func (s Setting) GetBool() bool {
+	v := s.Get()
+	b, err := strconv.ParseBool(v)
+	if err == nil {
+		return b
+	}
+
+	logrus.Errorf("failed to parse setting %s=%s as boolean: %v", s.Name, v, err)
+	b, err = strconv.ParseBool(s.Default)
+	if err != nil {
+		return false
+	}
+	return b
+}
+
 // GetDuration will return the currently stored value of the setting as a time.Duration.
 // If the stored value is not a duration then the default value will be returned as a duration.
 // If the default value is not a duration then the function will return 0

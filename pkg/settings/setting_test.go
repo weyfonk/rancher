@@ -149,6 +149,37 @@ func TestGetMachineProvisionImagePullPolicy(t *testing.T) {
 	}
 }
 
+func TestGetBool(t *testing.T) {
+	fakeBoolSetting := NewSetting("bool", "true")
+	fakeStringSetting := NewSetting("string", "something-else")
+
+	err := fakeBoolSetting.Set("true")
+	assert.NoError(t, err)
+	assert.True(t, fakeBoolSetting.GetBool())
+
+	err = fakeBoolSetting.Set("false")
+	assert.NoError(t, err)
+	assert.False(t, fakeBoolSetting.GetBool())
+
+	// Get the default value when the set value is not a boolean
+	err = fakeBoolSetting.Set("something")
+	assert.NoError(t, err)
+	assert.True(t, fakeBoolSetting.GetBool())
+
+	err = fakeStringSetting.Set("false")
+	assert.NoError(t, err)
+	assert.False(t, fakeStringSetting.GetBool())
+
+	err = fakeStringSetting.Set("true")
+	assert.NoError(t, err)
+	assert.True(t, fakeStringSetting.GetBool())
+
+	// Get false if neither the set value nor the default value are booleans
+	err = fakeStringSetting.Set("something")
+	assert.NoError(t, err)
+	assert.False(t, fakeStringSetting.GetBool())
+}
+
 func TestGetInt(t *testing.T) {
 	fakeIntSetting := NewSetting("int", "1")
 	fakeStringSetting := NewSetting("string", "one")
