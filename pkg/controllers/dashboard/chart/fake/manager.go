@@ -54,6 +54,23 @@ func (mr *MockManagerMockRecorder) Ensure(dsc, takeOwnership, installImageOverri
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ensure", reflect.TypeOf((*MockManager)(nil).Ensure), dsc, takeOwnership, installImageOverride)
 }
 
+// Get mocks base method.
+func (m *MockManager) Get(namespace, releaseName string) (string, string, map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", namespace, releaseName)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(string)
+	ret2, _ := ret[2].(map[string]any)
+	ret3, _ := ret[3].(error)
+	return ret0, ret1, ret2, ret3
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockManagerMockRecorder) Get(namespace, releaseName any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockManager)(nil).Get), namespace, releaseName)
+}
+
 // Remove mocks base method.
 func (m *MockManager) Remove(namespace, releaseName string) {
 	m.ctrl.T.Helper()

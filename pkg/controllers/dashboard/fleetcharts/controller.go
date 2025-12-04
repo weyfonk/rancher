@@ -101,13 +101,29 @@ func (h *handler) onSetting(key string, setting *v3.Setting) (*v3.Setting, error
 		MinVersion:       fleetVersion,
 		// Empty ExactVersion
 		// nil values
+		//SkipInstall: settings.FleetBeforeRancher.GetBool(),
 	}
 
+	if settings.FleetBeforeRancher.GetBool() {
+		chartVersion, _, _, err := h.manager.Get(wantedCRD.ReleaseNamespace, wantedCRD.ReleaseName)
+		if err != nil {
+			return setting, err
+		}
+
+		if chartVersion != "" {
+			wantedCRD.MinVersion = chartVersion
+		}
+	}
+
+	// XXX: if the decision on whether to install can be made here, do we really need SkipInstall?
+
+	h.Lock()
 	if err := h.manager.Ensure(wantedCRD, true, ""); err != nil {
 		h.Unlock()
 
 		return setting, err
 	}
+	h.Unlock()
 
 	systemGlobalRegistry := map[string]interface{}{
 		"cattle": map[string]interface{}{
@@ -159,7 +175,27 @@ func (h *handler) onSetting(key string, setting *v3.Setting) (*v3.Setting, error
 		MinVersion:       fleetVersion,
 		// Empty ExactVersion
 		Values: fleetChartValues,
+		//SkipInstall: settings.FleetBeforeRancher.GetBool(),
 	}
+
+	if settings.FleetBeforeRancher.GetBool() {
+		chartVersion, _, installedValues, err := h.manager.Get(wantedFleet.ReleaseNamespace, wantedFleet.ReleaseName)
+		if err != nil {
+			return setting, err
+		}
+
+		if chartVersion != "" {
+			wantedFleet.MinVersion = chartVersion
+			// wantedFleet.Values, including watched settings, have precedence over values of the already
+			// installed Fleet chart. Hence this ordering of arguments in data.MergeMaps.
+			wantedFleet.Values = data.MergeMaps(installedValues, wantedFleet.Values)
+		}
+
+		logrus.Warnf("Detected change in setting: %q (value: %q), will install Fleet %s", setting.Name, setting.Value, wantedFleet.MinVersion)
+	}
+
+	h.Lock()
+	defer h.Unlock()
 
 	return setting, h.manager.Ensure(wantedFleet, true, "")
 }

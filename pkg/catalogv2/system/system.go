@@ -442,6 +442,27 @@ func podDone(chart string, newPod *v1.Pod) (bool, error) {
 	return false, nil
 }
 
+// Get retrieves an installed release by the specified name and namespace.
+// It returns the installed chart version, app version and values.
+// If no installed release could be found or an error occurred, versions and values will be empty.
+func (m *Manager) Get(namespace, name string) (string, string, map[string]interface{}, error) {
+	releases, err := m.helmClient.ListReleases(namespace, name, action.ListDeployed)
+	if err != nil {
+		return "", "", nil, fmt.Errorf("failed to list releases for %s/%s: %w", namespace, name, err)
+	}
+
+	if len(releases) == 0 {
+		return "", "", nil, nil
+	}
+
+	// XXX: merge release.Config w/ chart values?
+	// XXX: we need to be able to get the chart version and, if mapping between Fleet standalone and
+	// Rancher-packaged Fleet charts is needed, use that app version to search through the Rancher charts index
+	chart := releases[0].Chart
+
+	return chart.Metadata.Version, chart.AppVersion(), releases[0].Chart.Values, nil
+}
+
 // isInstalled gets all releases for a particular namespace and name that has the status action.ListDeployed.
 // It calls the desiredVersionAndValues function with it to return if the chart is installed, the desired version and the desired values for it.
 func (m *Manager) isInstalled(namespace, name, minVersion, desiredVersion string, isExact bool, desiredValue map[string]interface{}) (bool, string, map[string]interface{}, error) {

@@ -2,6 +2,7 @@ package fleetcharts
 
 import (
 	"fmt"
+	"maps"
 	"os"
 	"testing"
 
@@ -54,6 +55,7 @@ func Test_ChartInstallation(t *testing.T) {
 			newManager: func(ctrl *gomock.Controller) chart.Manager {
 				settings.ConfigMapName.Set("pass")
 				settings.FleetMinVersion.Set("")
+				settings.FleetBeforeRancher.Set("false")
 
 				manager := fake.NewMockManager(ctrl)
 				expectedValues := map[string]interface{}{
@@ -109,6 +111,88 @@ func Test_ChartInstallation(t *testing.T) {
 			},
 		},
 		{
+			name: "existing Fleet-first installation with values update",
+			newManager: func(ctrl *gomock.Controller) chart.Manager {
+				settings.ConfigMapName.Set("pass")
+				settings.FleetMinVersion.Set("")
+				settings.FleetBeforeRancher.Set("true")
+				settings.AgentTLSMode.Set("strict")
+
+				manager := fake.NewMockManager(ctrl)
+				expectedValues := map[string]interface{}{
+					"agentTLSMode": settings.AgentTLSMode.Get(),
+					"apiServerURL": settings.ServerURL.Get(),
+					"apiServerCA":  settings.CACerts.Get(),
+					"global": map[string]interface{}{
+						"cattle": map[string]interface{}{
+							"systemDefaultRegistry": settings.SystemDefaultRegistry.Get(),
+						},
+					},
+					"bootstrap": map[string]interface{}{
+						"enabled":        false,
+						"agentNamespace": fleetconst.ReleaseLocalNamespace,
+					},
+					"gitops": map[string]interface{}{
+						"enabled": features.Gitops.Enabled(),
+					},
+					"priorityClassName": priorityClassName,
+				}
+
+				exactVersion := "0.13.0"
+				settings.FleetVersion.Set(exactVersion)
+
+				var b bool
+				existingValues := map[string]interface{}{}
+				maps.Copy(existingValues, expectedValues)
+
+				existingValues["agentTLSMode"] = "system-store"
+				existingValues["foo"] = "bar"
+
+				manager.EXPECT().Get(fleetconst.ReleaseNamespace, fleetconst.CRDChartName).Return(
+					"106.1.7+up0.12.9", // non-empty → already installed
+					"0.12.9",
+					nil,
+					nil,
+				).Times(len(stgs))
+				manager.EXPECT().Ensure(
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.CRDChartName,
+						ChartName:        fleetconst.CRDChartName,
+						MinVersion:       "106.1.7+up0.12.9",
+						ExactVersion:     "",
+						// nil values
+					},
+					gomock.AssignableToTypeOf(b),
+					"",
+				).Return(nil).Times(len(stgs))
+
+				manager.EXPECT().Get(fleetconst.ReleaseNamespace, fleetconst.ChartName).Return(
+					"106.1.7+up0.12.9", // non-empty → already installed
+					"0.12.9",
+					existingValues,
+					nil,
+				).Times(len(stgs))
+
+				expectedValues["foo"] = existingValues["foo"]
+				manager.EXPECT().Ensure(
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.ChartName,
+						ChartName:        fleetconst.ChartName,
+						MinVersion:       "106.1.7+up0.12.9",
+						ExactVersion:     "",
+						Values:           expectedValues,
+					},
+					gomock.AssignableToTypeOf(b),
+					"",
+				).Return(nil).Times(len(stgs))
+
+				manager.EXPECT().Uninstall(fleetconst.ReleaseLegacyNamespace, fleetconst.ChartName).Return(nil).Times(len(stgs))
+				return manager
+			},
+		},
+		{
 			name: "normal installation with min version precedence",
 			newManager: func(ctrl *gomock.Controller) chart.Manager {
 				settings.ConfigMapName.Set("pass")
@@ -136,6 +220,7 @@ func Test_ChartInstallation(t *testing.T) {
 				exactVersion := "0.7.1"
 				settings.FleetVersion.Set(exactVersion)
 				settings.FleetMinVersion.Set(minVersion)
+				settings.FleetBeforeRancher.Set("false")
 
 				var b bool
 				manager.EXPECT().Ensure(
@@ -172,6 +257,7 @@ func Test_ChartInstallation(t *testing.T) {
 			newManager: func(ctrl *gomock.Controller) chart.Manager {
 				settings.ConfigMapName.Set("fail")
 				settings.FleetMinVersion.Set("")
+				settings.FleetBeforeRancher.Set("false")
 
 				manager := fake.NewMockManager(ctrl)
 				expectedValues := map[string]interface{}{
@@ -233,6 +319,7 @@ bootstrap:
 			newManager: func(ctrl *gomock.Controller) chart.Manager {
 				settings.ConfigMapName.Set("pass")
 				settings.FleetMinVersion.Set("")
+				settings.FleetBeforeRancher.Set("false")
 
 				manager := fake.NewMockManager(ctrl)
 				expectedValues := map[string]interface{}{

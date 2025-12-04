@@ -42,6 +42,10 @@ var errKeyNotFound = errors.New("key not found")
 
 // Manager is an interface used by the handler to install and uninstall charts.
 type Manager interface {
+	// Get checks if the given release is installed, and returns a non-empty versions accordingly: chart version, then
+	// app version, and values.
+	Get(namespace, releaseName string) (string, string, map[string]interface{}, error)
+
 	// Ensure ensures that the chart is installed into the given namespace with the given version configuration and values.
 	Ensure(dsc chart.DesiredState, takeOwnership bool, installImageOverride string) error
 
