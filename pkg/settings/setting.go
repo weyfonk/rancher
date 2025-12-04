@@ -213,6 +213,10 @@ var (
 	// FleetVersion is the exact version of the Fleet chart that Rancher will install.
 	FleetVersion = NewSetting("fleet-version", "")
 
+	// FleetBeforeRancher determines whether an existing Fleet install should be adopted (instead of being
+	// overwritten) by Rancher at installation time.
+	FleetBeforeRancher = NewSetting("fleet-before-rancher", "false")
+
 	// AksOperatorVersion is the exact version of the aks-operator and aks-operator-crd charts that Rancher will install.
 	AksOperatorVersion = NewSetting("aks-operator-version", "")
 
