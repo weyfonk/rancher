@@ -15,6 +15,7 @@ import (
 	"github.com/rancher/rancher/pkg/api/steve/catalog/types"
 	catalog "github.com/rancher/rancher/pkg/apis/catalog.cattle.io/v1"
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
+	"github.com/rancher/rancher/pkg/chart"
 	catalogcontrollers "github.com/rancher/rancher/pkg/generated/controllers/catalog.cattle.io/v1"
 	mgmtcontrollers "github.com/rancher/rancher/pkg/generated/controllers/management.cattle.io/v3"
 	"github.com/rancher/rancher/pkg/settings"
@@ -236,18 +237,22 @@ func (m *Manager) Uninstall(namespace, name string) error {
 	return m.waitPodDone(op)
 }
 
-func (m *Manager) Ensure(namespace, chartName, releaseName, minVersion, exactVersion string, values map[string]interface{}, takeOwnership bool, installImageOverride string) error {
+func (m *Manager) Ensure(desiredState chart.DesiredState, takeOwnership bool, installImageOverride string) error {
+	if desiredState.SkipInstall {
+		return nil
+	}
+
 	go func() {
 		m.sync <- desired{
 			key: desiredKey{
-				namespace:            namespace,
-				chartName:            chartName,
-				releaseName:          releaseName,
-				minVersion:           minVersion,
-				exactVersion:         exactVersion,
+				namespace:            desiredState.ReleaseNamespace,
+				chartName:            desiredState.ChartName,
+				releaseName:          desiredState.ReleaseName,
+				minVersion:           desiredState.MinVersion,
+				exactVersion:         desiredState.ExactVersion,
 				installImageOverride: installImageOverride,
 			},
-			values:        values,
+			values:        desiredState.Values,
 			takeOwnership: takeOwnership,
 		}
 	}()

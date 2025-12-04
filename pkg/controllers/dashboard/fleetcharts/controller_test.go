@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
+	chartpkg "github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/controllers/dashboard/chart"
 	"github.com/rancher/rancher/pkg/controllers/dashboard/chart/fake"
 	"github.com/rancher/rancher/pkg/features"
@@ -79,22 +80,26 @@ func Test_ChartInstallation(t *testing.T) {
 
 				var b bool
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.CRDChartName,
-					fleetconst.CRDChartName,
-					exactVersion,
-					"",
-					nil,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.CRDChartName,
+						ChartName:        fleetconst.CRDChartName,
+						MinVersion:       exactVersion,
+						ExactVersion:     "",
+						// nil values
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.ChartName,
-					fleetconst.ChartName,
-					exactVersion,
-					"",
-					expectedValues,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.ChartName,
+						ChartName:        fleetconst.ChartName,
+						MinVersion:       exactVersion,
+						ExactVersion:     "",
+						Values:           expectedValues,
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))
@@ -134,22 +139,26 @@ func Test_ChartInstallation(t *testing.T) {
 
 				var b bool
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.CRDChartName,
-					fleetconst.CRDChartName,
-					minVersion,
-					"",
-					nil,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.CRDChartName,
+						ChartName:        fleetconst.CRDChartName,
+						MinVersion:       minVersion,
+						ExactVersion:     "",
+						// nil values
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.ChartName,
-					fleetconst.ChartName,
-					minVersion,
-					"",
-					expectedValues,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.ChartName,
+						ChartName:        fleetconst.ChartName,
+						MinVersion:       minVersion,
+						ExactVersion:     "",
+						Values:           expectedValues,
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))
@@ -184,22 +193,26 @@ func Test_ChartInstallation(t *testing.T) {
 				}
 				var b bool
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.CRDChartName,
-					fleetconst.CRDChartName,
-					settings.FleetVersion.Get(),
-					"",
-					nil,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.CRDChartName,
+						ChartName:        fleetconst.CRDChartName,
+						MinVersion:       settings.FleetVersion.Get(),
+						ExactVersion:     "",
+						// nil values
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.ChartName,
-					fleetconst.ChartName,
-					settings.FleetVersion.Get(),
-					"",
-					expectedValues,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.ChartName,
+						ChartName:        fleetconst.ChartName,
+						MinVersion:       settings.FleetVersion.Get(),
+						ExactVersion:     "",
+						Values:           expectedValues,
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))
@@ -249,22 +262,26 @@ bootstrap:
 
 				var b bool
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.CRDChartName,
-					fleetconst.CRDChartName,
-					exactVersion,
-					"",
-					nil,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.CRDChartName,
+						ChartName:        fleetconst.CRDChartName,
+						MinVersion:       exactVersion,
+						ExactVersion:     "",
+						// nil values
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))
 				manager.EXPECT().Ensure(
-					fleetconst.ReleaseNamespace,
-					fleetconst.ChartName,
-					fleetconst.ChartName,
-					exactVersion,
-					"",
-					expectedValues,
+					chartpkg.DesiredState{
+						ReleaseNamespace: fleetconst.ReleaseNamespace,
+						ReleaseName:      fleetconst.ChartName,
+						ChartName:        fleetconst.ChartName,
+						MinVersion:       exactVersion,
+						ExactVersion:     "",
+						Values:           expectedValues,
+					},
 					gomock.AssignableToTypeOf(b),
 					"",
 				).Return(nil).Times(len(stgs))

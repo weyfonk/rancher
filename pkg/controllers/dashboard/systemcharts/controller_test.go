@@ -8,6 +8,7 @@ import (
 
 	catalog "github.com/rancher/rancher/pkg/apis/catalog.cattle.io/v1"
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
+	chartpkg "github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/controllers/dashboard/chart"
 	chartfake "github.com/rancher/rancher/pkg/controllers/dashboard/chart/fake"
 	"github.com/rancher/rancher/pkg/controllers/management/importedclusterversionmanagement"
@@ -180,16 +181,14 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -205,16 +204,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				expectedSUCValues := map[string]interface{}{
@@ -225,16 +223,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.SystemUpgradeControllerChartName,
-					chart.SystemUpgradeControllerChartName,
-					"",
-					"2.0.0",
-					expectedSUCValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.SystemUpgradeControllerChartName,
+					ChartName:        chart.SystemUpgradeControllerChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedSUCValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-operator
 				mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil)
@@ -269,16 +266,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -294,16 +290,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				expectedSUCValues := map[string]interface{}{
@@ -314,16 +309,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.SystemUpgradeControllerChartName,
-					sucAppNameOverride,
-					"",
-					"2.0.0",
-					expectedSUCValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      sucAppNameOverride,
+					ChartName:        chart.SystemUpgradeControllerChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedSUCValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-operator
 				mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil)
@@ -358,16 +352,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -383,16 +376,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				// the Ensure function is not invoked in this case
@@ -430,16 +422,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -455,16 +446,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				// the Ensure function is not invoked in this case
@@ -502,16 +492,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -527,16 +516,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				// the Ensure function is not invoked in this case
@@ -573,16 +561,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -598,16 +585,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				mocks.manager.EXPECT().Uninstall(namespace.System, chart.SystemUpgradeControllerChartName).Return(nil)
@@ -645,16 +631,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -670,16 +655,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				expectedSUCValues := map[string]interface{}{
@@ -690,16 +674,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.SystemUpgradeControllerChartName,
-					chart.SystemUpgradeControllerChartName,
-					"",
-					"2.0.0",
-					expectedSUCValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.SystemUpgradeControllerChartName,
+					ChartName:        chart.SystemUpgradeControllerChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedSUCValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// remotedialer-proxy
 				expectedRDPValues := map[string]interface{}{
@@ -710,16 +693,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.RemoteDialerProxyChartName,
-					chart.RemoteDialerProxyChartName,
-					"",
-					"2.0.0",
-					expectedRDPValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.RemoteDialerProxyChartName,
+					ChartName:        chart.RemoteDialerProxyChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedRDPValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-operator
 				mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil)
@@ -753,16 +735,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -778,16 +759,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// remotedialer-proxy
 				expectedRDPValues := map[string]interface{}{
@@ -798,16 +778,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.RemoteDialerProxyChartName,
-					chart.RemoteDialerProxyChartName,
-					"",
-					"2.0.0",
-					expectedRDPValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.RemoteDialerProxyChartName,
+					ChartName:        chart.RemoteDialerProxyChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedRDPValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				mocks.manager.EXPECT().Uninstall(namespace.System, chart.SystemUpgradeControllerChartName).Return(nil)
@@ -846,16 +825,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -871,16 +849,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// remotedialer-proxy
 				expectedRDPValues := map[string]interface{}{
@@ -891,16 +868,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.RemoteDialerProxyChartName,
-					chart.RemoteDialerProxyChartName,
-					"",
-					"2.0.0",
-					expectedRDPValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.RemoteDialerProxyChartName,
+					ChartName:        chart.RemoteDialerProxyChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedRDPValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				// the Ensure function is not invoked in this case
@@ -939,16 +915,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -964,16 +939,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				// the Ensure function is not invoked in this case
@@ -1009,16 +983,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -1033,16 +1006,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				expectedSUCValues := map[string]interface{}{
@@ -1052,16 +1024,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.SystemUpgradeControllerChartName,
-					chart.SystemUpgradeControllerChartName,
-					"",
-					"2.0.0",
-					expectedSUCValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.SystemUpgradeControllerChartName,
+					ChartName:        chart.SystemUpgradeControllerChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedSUCValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// remotedialer-proxy
 				expectedRDPValues := map[string]interface{}{
@@ -1071,16 +1042,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.RemoteDialerProxyChartName,
-					chart.RemoteDialerProxyChartName,
-					"",
-					"2.0.0",
-					expectedRDPValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.RemoteDialerProxyChartName,
+					ChartName:        chart.RemoteDialerProxyChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedRDPValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-operator
 				mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil)
@@ -1116,16 +1086,15 @@ func Test_ChartInstallation(t *testing.T) {
 						"repository": "rancher-test.io/rancher/rancher-webhook",
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.1",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"rancher-test.io/"+settings.ShellImage.Get(),
-				).Return(nil)
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.1",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "rancher-test.io/"+settings.ShellImage.Get()).Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -1143,16 +1112,15 @@ func Test_ChartInstallation(t *testing.T) {
 						"repository": "rancher-test.io/rancher/turtles",
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.1",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"rancher-test.io/"+settings.ShellImage.Get(),
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.1",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "rancher-test.io/"+settings.ShellImage.Get()).Return(nil)
 
 				// system-upgrade-controller
 				expectedSUCValues := map[string]interface{}{
@@ -1171,16 +1139,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.SystemUpgradeControllerChartName,
-					chart.SystemUpgradeControllerChartName,
-					"",
-					"2.0.1",
-					expectedSUCValues,
-					gomock.AssignableToTypeOf(false),
-					"rancher-test.io/"+settings.ShellImage.Get(),
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.SystemUpgradeControllerChartName,
+					ChartName:        chart.SystemUpgradeControllerChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.1",
+					Values:           expectedSUCValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "rancher-test.io/"+settings.ShellImage.Get()).Return(nil)
 
 				// remotedialer-proxy
 				expectedRDPValues := map[string]interface{}{
@@ -1193,16 +1160,15 @@ func Test_ChartInstallation(t *testing.T) {
 						"repository": "rancher-test.io/rancher/remotedialer-proxy",
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.RemoteDialerProxyChartName,
-					chart.RemoteDialerProxyChartName,
-					"",
-					"2.0.1",
-					expectedRDPValues,
-					gomock.AssignableToTypeOf(false),
-					"rancher-test.io/"+settings.ShellImage.Get(),
-				).Return(nil)
+				wanted = chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.RemoteDialerProxyChartName,
+					ChartName:        chart.RemoteDialerProxyChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.1",
+					Values:           expectedRDPValues,
+				}
+				mocks.manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(false), "rancher-test.io/"+settings.ShellImage.Get()).Return(nil)
 
 				// rancher-operator
 				mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil)
@@ -1235,16 +1201,15 @@ func Test_ChartInstallation(t *testing.T) {
 					"global": "",
 					"newKey": "newValue",
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.WebhookChartName,
-					chart.WebhookChartName,
-					"",
-					"2.0.0",
-					expectedValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wantedWebhook := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.WebhookChartName,
+					ChartName:        chart.WebhookChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedValues,
+				}
+				mocks.manager.EXPECT().Ensure(wantedWebhook, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-turtles
 				expectedTurtlesValues := map[string]interface{}{
@@ -1260,16 +1225,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.TurtlesNamespace,
-					chart.TurtlesChartName,
-					chart.TurtlesChartName,
-					"",
-					"2.0.0",
-					expectedTurtlesValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wantedTurtles := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.TurtlesNamespace,
+					ReleaseName:      chart.TurtlesChartName,
+					ChartName:        chart.TurtlesChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedTurtlesValues,
+				}
+				mocks.manager.EXPECT().Ensure(wantedTurtles, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// system-upgrade-controller
 				expectedSUCValues := map[string]interface{}{
@@ -1280,16 +1244,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.SystemUpgradeControllerChartName,
-					chart.SystemUpgradeControllerChartName,
-					"",
-					"2.0.0",
-					expectedSUCValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wantedSUC := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.SystemUpgradeControllerChartName,
+					ChartName:        chart.SystemUpgradeControllerChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.0",
+					Values:           expectedSUCValues,
+				}
+				mocks.manager.EXPECT().Ensure(wantedSUC, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// remotedialer-proxy
 				expectedRDPValues := map[string]interface{}{
@@ -1300,16 +1263,15 @@ func Test_ChartInstallation(t *testing.T) {
 						},
 					},
 				}
-				mocks.manager.EXPECT().Ensure(
-					namespace.System,
-					chart.RemoteDialerProxyChartName,
-					chart.RemoteDialerProxyChartName,
-					"",
-					"2.0.1",
-					expectedRDPValues,
-					gomock.AssignableToTypeOf(false),
-					"",
-				).Return(nil)
+				wantedRDP := chartpkg.DesiredState{
+					ReleaseNamespace: namespace.System,
+					ReleaseName:      chart.RemoteDialerProxyChartName,
+					ChartName:        chart.RemoteDialerProxyChartName,
+					MinVersion:       "",
+					ExactVersion:     "2.0.1",
+					Values:           expectedRDPValues,
+				}
+				mocks.manager.EXPECT().Ensure(wantedRDP, gomock.AssignableToTypeOf(false), "").Return(nil)
 
 				// rancher-operator
 				mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil)
@@ -1413,10 +1375,25 @@ func Test_TurtlesInstallation(t *testing.T) {
 			"cattle": map[string]interface{}{"systemDefaultRegistry": settings.SystemDefaultRegistry.Get()},
 		},
 	}
+
+	wantedWebhook := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.System,
+		ReleaseName:      chart.WebhookChartName,
+		ChartName:        chart.WebhookChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+		Values:           expectedWebhookValues,
+	}
+	wantedTurtles := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.TurtlesNamespace,
+		ReleaseName:      chart.TurtlesChartName,
+		ChartName:        chart.TurtlesChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+		Values:           expectedTurtlesValues,
+	}
 	gomock.InOrder(
-		mocks.manager.EXPECT().Ensure(
-			namespace.System, chart.WebhookChartName, chart.WebhookChartName, "", "2.0.0", expectedWebhookValues, gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(wantedWebhook, gomock.AssignableToTypeOf(false), "").Return(nil),
 
 		mocks.manager.EXPECT().Remove(operatorNamespace, "rancher-operator"),
 		mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil),
@@ -1426,9 +1403,7 @@ func Test_TurtlesInstallation(t *testing.T) {
 		mocks.manager.EXPECT().Uninstall(namespace.ProvisioningCAPINamespace, chart.ProvisioningCAPIChartName).Return(nil),
 		mocks.namespaceCtrl.EXPECT().Delete(namespace.ProvisioningCAPINamespace, nil).Return(nil),
 
-		mocks.manager.EXPECT().Ensure(
-			namespace.TurtlesNamespace, chart.TurtlesChartName, chart.TurtlesChartName, "", "2.0.0", expectedTurtlesValues, gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(wantedTurtles, gomock.AssignableToTypeOf(false), "").Return(nil),
 	)
 
 	h := mocks.Handler()
@@ -1464,11 +1439,15 @@ func Test_SwitchFromProvisioningToTurtlesRace(t *testing.T) {
 	mocks.planCache.EXPECT().List(namespace.System, managedPlanSelector).Return(plans, nil).Times(2)
 	mocks.deploymentCache.EXPECT().Get(namespace.System, sucDeploymentName).Return(nil, apierrors.NewNotFound(schema.GroupResource{Group: "apps", Resource: "deployments"}, sucDeploymentName)).AnyTimes()
 
+	wantedWebhook := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.System,
+		ReleaseName:      chart.WebhookChartName,
+		ChartName:        chart.WebhookChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+	}
 	gomock.InOrder(
-		mocks.manager.EXPECT().Ensure(
-			namespace.System, chart.WebhookChartName, chart.WebhookChartName, "", "2.0.0",
-			gomock.AssignableToTypeOf(map[string]interface{}{}), gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(DesiredStateMatcher(wantedWebhook), gomock.AssignableToTypeOf(false), "").Return(nil),
 
 		mocks.manager.EXPECT().Remove(operatorNamespace, "rancher-operator"),
 		mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil),
@@ -1494,11 +1473,16 @@ func Test_SwitchFromProvisioningToTurtlesRace(t *testing.T) {
 			"cattle": map[string]interface{}{"systemDefaultRegistry": settings.SystemDefaultRegistry.Get()},
 		},
 	}
+	wantedTurtles := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.TurtlesNamespace,
+		ReleaseName:      chart.TurtlesChartName,
+		ChartName:        chart.TurtlesChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+		Values:           expectedTurtlesValues,
+	}
 	gomock.InOrder(
-		mocks.manager.EXPECT().Ensure(
-			namespace.System, chart.WebhookChartName, chart.WebhookChartName, "", "2.0.0",
-			gomock.AssignableToTypeOf(map[string]interface{}{}), gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(DesiredStateMatcher(wantedWebhook), gomock.AssignableToTypeOf(false), "").Return(nil),
 
 		mocks.manager.EXPECT().Remove(operatorNamespace, "rancher-operator"),
 		mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil),
@@ -1509,9 +1493,7 @@ func Test_SwitchFromProvisioningToTurtlesRace(t *testing.T) {
 		mocks.namespaceCtrl.EXPECT().Delete(namespace.ProvisioningCAPINamespace, nil).Return(nil),
 
 		mocks.namespaceCache.EXPECT().Get(namespace.ProvisioningCAPINamespace).Return(nil, apierrors.NewNotFound(schema.GroupResource{Group: "", Resource: "namespaces"}, namespace.ProvisioningCAPINamespace)),
-		mocks.manager.EXPECT().Ensure(
-			namespace.TurtlesNamespace, chart.TurtlesChartName, chart.TurtlesChartName, "", "2.0.0", expectedTurtlesValues, gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(wantedTurtles, gomock.AssignableToTypeOf(false), "").Return(nil),
 	)
 
 	_, err = h.onRepo("", repo)
@@ -1549,11 +1531,15 @@ func Test_SwitchFromTurtlesToProvisioningRace(t *testing.T) {
 	mocks.deploymentCache.EXPECT().Get(namespace.System, sucDeploymentName).Return(nil, apierrors.NewNotFound(schema.GroupResource{Group: "apps", Resource: "deployments"}, sucDeploymentName)).AnyTimes()
 
 	mocks.namespaceCache.EXPECT().Get(namespace.TurtlesNamespace).Return(&v1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: namespace.TurtlesNamespace}}, nil)
+	wantedWebhook := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.System,
+		ReleaseName:      chart.WebhookChartName,
+		ChartName:        chart.WebhookChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+	}
 	gomock.InOrder(
-		mocks.manager.EXPECT().Ensure(
-			namespace.System, chart.WebhookChartName, chart.WebhookChartName, "", "2.0.0",
-			gomock.AssignableToTypeOf(map[string]interface{}{}), gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(DesiredStateMatcher(wantedWebhook), gomock.AssignableToTypeOf(false), "").Return(nil),
 
 		mocks.manager.EXPECT().Remove(operatorNamespace, "rancher-operator"),
 		mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil),
@@ -1573,21 +1559,23 @@ func Test_SwitchFromTurtlesToProvisioningRace(t *testing.T) {
 			"cattle": map[string]interface{}{"systemDefaultRegistry": settings.SystemDefaultRegistry.Get()},
 		},
 	}
+	wantedProvisioningCAPI := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.ProvisioningCAPINamespace,
+		ReleaseName:      chart.ProvisioningCAPIChartName,
+		ChartName:        chart.ProvisioningCAPIChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+		Values:           expectedProvCAPIValues,
+	}
 	gomock.InOrder(
-		mocks.manager.EXPECT().Ensure(
-			namespace.System, chart.WebhookChartName, chart.WebhookChartName, "", "2.0.0",
-			gomock.AssignableToTypeOf(map[string]interface{}{}), gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(DesiredStateMatcher(wantedWebhook), gomock.AssignableToTypeOf(false), "").Return(nil),
 
 		mocks.manager.EXPECT().Remove(operatorNamespace, "rancher-operator"),
 		mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil),
 		mocks.namespaceCtrl.EXPECT().Delete(operatorNamespace, nil).Return(nil),
 
 		mocks.namespaceCache.EXPECT().Get(namespace.TurtlesNamespace).Return(nil, apierrors.NewNotFound(schema.GroupResource{Group: "", Resource: "namespaces"}, namespace.TurtlesNamespace)),
-		mocks.manager.EXPECT().Ensure(
-			namespace.ProvisioningCAPINamespace, chart.ProvisioningCAPIChartName, chart.ProvisioningCAPIChartName, "", "2.0.0",
-			expectedProvCAPIValues, gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(wantedProvisioningCAPI, gomock.AssignableToTypeOf(false), "").Return(nil),
 		mocks.manager.EXPECT().Remove(namespace.TurtlesNamespace, chart.TurtlesChartName),
 		mocks.manager.EXPECT().Uninstall(namespace.TurtlesNamespace, chart.TurtlesChartName).Return(nil),
 		mocks.namespaceCtrl.EXPECT().Delete(namespace.TurtlesNamespace, nil).Return(nil),
@@ -1635,11 +1623,23 @@ func Test_TurtlesWinsWhenBothEnabled(t *testing.T) {
 			"cattle": map[string]interface{}{"systemDefaultRegistry": settings.SystemDefaultRegistry.Get()},
 		},
 	}
+	wantedWebhook := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.System,
+		ReleaseName:      chart.WebhookChartName,
+		ChartName:        chart.WebhookChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+	}
+	wantedTurtles := chartpkg.DesiredState{
+		ReleaseNamespace: namespace.TurtlesNamespace,
+		ReleaseName:      chart.TurtlesChartName,
+		ChartName:        chart.TurtlesChartName,
+		MinVersion:       "",
+		ExactVersion:     "2.0.0",
+		Values:           expectedTurtlesValues,
+	}
 	gomock.InOrder(
-		mocks.manager.EXPECT().Ensure(
-			namespace.System, chart.WebhookChartName, chart.WebhookChartName, "", "2.0.0",
-			gomock.AssignableToTypeOf(map[string]interface{}{}), gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(DesiredStateMatcher(wantedWebhook), gomock.AssignableToTypeOf(false), "").Return(nil),
 
 		mocks.manager.EXPECT().Remove(operatorNamespace, "rancher-operator"),
 		mocks.manager.EXPECT().Uninstall(operatorNamespace, "rancher-operator").Return(nil),
@@ -1649,10 +1649,7 @@ func Test_TurtlesWinsWhenBothEnabled(t *testing.T) {
 		mocks.manager.EXPECT().Uninstall(namespace.ProvisioningCAPINamespace, chart.ProvisioningCAPIChartName).Return(nil),
 		mocks.namespaceCtrl.EXPECT().Delete(namespace.ProvisioningCAPINamespace, nil).Return(nil),
 
-		mocks.manager.EXPECT().Ensure(
-			namespace.TurtlesNamespace, chart.TurtlesChartName, chart.TurtlesChartName, "", "2.0.0",
-			expectedTurtlesValues, gomock.AssignableToTypeOf(false), "",
-		).Return(nil),
+		mocks.manager.EXPECT().Ensure(wantedTurtles, gomock.AssignableToTypeOf(false), "").Return(nil),
 	)
 
 	h := mocks.Handler()
@@ -1876,4 +1873,45 @@ func Test_relatedSettings(t *testing.T) {
 
 		})
 	}
+}
+
+// desiredStateMatcher matches a desired chart state, without expecting nil values.
+type desiredStateMatcher struct {
+	desiredState chartpkg.DesiredState
+}
+
+func (d desiredStateMatcher) Matches(x any) bool {
+	ds, ok := x.(chartpkg.DesiredState)
+	if !ok {
+		return false
+	}
+
+	if ds.ReleaseNamespace != d.desiredState.ReleaseNamespace {
+		return false
+	}
+
+	if ds.ReleaseName != d.desiredState.ReleaseName {
+		return false
+	}
+
+	if ds.ChartName != d.desiredState.ChartName {
+		return false
+	}
+
+	if ds.MinVersion != d.desiredState.MinVersion {
+		return false
+	}
+
+	if ds.ExactVersion != d.desiredState.ExactVersion {
+		return false
+	}
+
+	return true
+}
+func (d desiredStateMatcher) String() string {
+	return fmt.Sprintf("is equal to DesiredState %v", d.desiredState)
+}
+
+func DesiredStateMatcher(ds chartpkg.DesiredState) gomock.Matcher {
+	return &desiredStateMatcher{ds}
 }

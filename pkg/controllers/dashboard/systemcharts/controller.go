@@ -10,6 +10,7 @@ import (
 
 	catalog "github.com/rancher/rancher/pkg/apis/catalog.cattle.io/v1"
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
+	chartpkg "github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/controllers/dashboard/chart"
 	"github.com/rancher/rancher/pkg/controllers/management/importedclusterversionmanagement"
 	"github.com/rancher/rancher/pkg/controllers/management/k3sbasedupgrade"
@@ -186,7 +187,15 @@ func (h *handler) onRepo(key string, repo *catalog.ClusterRepo) (*catalog.Cluste
 		minVersion := chartDef.MinVersionSetting.Get()
 		exactVersion := chartDef.ExactVersionSetting.Get()
 		takeOwnership := chartDef.ChartName == chart.WebhookChartName || chartDef.ChartName == chart.ProvisioningCAPIChartName
-		if err := h.manager.Ensure(chartDef.ReleaseNamespace, chartDef.ChartName, chartDef.ReleaseName, minVersion, exactVersion, values, takeOwnership, installImageOverride); err != nil {
+		wantedChart := chartpkg.DesiredState{
+			ReleaseNamespace: chartDef.ReleaseNamespace,
+			ReleaseName:      chartDef.ReleaseName,
+			ChartName:        chartDef.ChartName,
+			MinVersion:       minVersion,
+			ExactVersion:     exactVersion,
+			Values:           values,
+		}
+		if err := h.manager.Ensure(wantedChart, takeOwnership, installImageOverride); err != nil {
 			return repo, err
 		}
 	}

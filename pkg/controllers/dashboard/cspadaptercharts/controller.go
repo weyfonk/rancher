@@ -9,6 +9,7 @@ import (
 
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
 	"github.com/rancher/rancher/pkg/catalogv2/system"
+	"github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/managedcharts/cspadapter"
 	"github.com/rancher/rancher/pkg/settings"
 	"github.com/rancher/rancher/pkg/wrangler"
@@ -46,6 +47,16 @@ func (h *handler) onSetting(key string, setting *v3.Setting) (*v3.Setting, error
 		// if we can't determine the status of the adapter, stop here and attempt to re-evaluate later
 		return setting, fmt.Errorf("unable to validate if the csp adater was installed: %w", err)
 	}
-	err = h.manager.Ensure(cspadapter.MLOChartNamespace, adapterRelease.Chart.Name(), adapterRelease.Name, settings.CSPAdapterMinVersion.Get(), "", nil, true, "")
+
+	wantedChart := chart.DesiredState{
+		ReleaseNamespace: cspadapter.MLOChartNamespace,
+		ReleaseName:      adapterRelease.Name,
+		ChartName:        adapterRelease.Chart.Name(),
+		MinVersion:       settings.CSPAdapterMinVersion.Get(),
+		// Empty ExactVersion
+		// nil values
+	}
+
+	err = h.manager.Ensure(wantedChart, true, "")
 	return setting, err
 }

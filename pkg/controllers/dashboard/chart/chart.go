@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/namespace"
 	"github.com/rancher/rancher/pkg/settings"
 	corev1 "github.com/rancher/wrangler/v3/pkg/generated/controllers/core/v1"
@@ -42,7 +43,7 @@ var errKeyNotFound = errors.New("key not found")
 // Manager is an interface used by the handler to install and uninstall charts.
 type Manager interface {
 	// Ensure ensures that the chart is installed into the given namespace with the given version configuration and values.
-	Ensure(namespace, chartName, releaseName, minVersion, exactVersion string, values map[string]interface{}, takeOwnership bool, installImageOverride string) error
+	Ensure(dsc chart.DesiredState, takeOwnership bool, installImageOverride string) error
 
 	// Uninstall uninstalls the given release in the given namespace.
 	Uninstall(namespace, releaseName string) error

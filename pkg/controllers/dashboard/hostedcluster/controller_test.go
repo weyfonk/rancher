@@ -8,6 +8,7 @@ import (
 
 	aksv1 "github.com/rancher/aks-operator/pkg/apis/aks.cattle.io/v1"
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
+	chartpkg "github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/controllers/dashboard/chart"
 	chartsfake "github.com/rancher/rancher/pkg/controllers/dashboard/chart/fake"
 	"github.com/rancher/rancher/pkg/settings"
@@ -52,26 +53,22 @@ func Test_handler_onClusterChange(t *testing.T) {
 					"priorityClassName":    priorityClassName,
 				}
 				var b bool
-				manager.EXPECT().Ensure(
-					AksCrdChart.ReleaseNamespace,
-					AksCrdChart.ReleaseName,
-					AksCrdChart.ChartName,
-					settings.AksOperatorVersion.Get(),
-					"",
-					nil,
-					gomock.AssignableToTypeOf(b),
-					"",
-				).Return(nil)
-				manager.EXPECT().Ensure(
-					AksChart.ReleaseNamespace,
-					AksChart.ReleaseName,
-					AksChart.ChartName,
-					settings.AksOperatorVersion.Get(),
-					"",
-					expectedValues,
-					gomock.AssignableToTypeOf(b),
-					"",
-				).Return(nil)
+				wantedCRD := chartpkg.DesiredState{
+					ReleaseNamespace: AksCrdChart.ReleaseNamespace,
+					ReleaseName:      AksCrdChart.ReleaseName,
+					ChartName:        AksCrdChart.ChartName,
+					MinVersion:       settings.AksOperatorVersion.Get(),
+					Values:           nil,
+				}
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: AksChart.ReleaseNamespace,
+					ReleaseName:      AksChart.ReleaseName,
+					ChartName:        AksChart.ChartName,
+					MinVersion:       settings.AksOperatorVersion.Get(),
+					Values:           expectedValues,
+				}
+				manager.EXPECT().Ensure(wantedCRD, gomock.AssignableToTypeOf(b), "").Return(nil)
+				manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(b), "").Return(nil)
 
 				return manager
 			},
@@ -99,26 +96,22 @@ func Test_handler_onClusterChange(t *testing.T) {
 					"additionalTrustedCAs": false,
 				}
 				var b bool
-				manager.EXPECT().Ensure(
-					AksCrdChart.ReleaseNamespace,
-					AksCrdChart.ReleaseName,
-					AksCrdChart.ChartName,
-					settings.AksOperatorVersion.Get(),
-					"",
-					nil,
-					gomock.AssignableToTypeOf(b),
-					"",
-				).Return(nil)
-				manager.EXPECT().Ensure(
-					AksChart.ReleaseNamespace,
-					AksChart.ReleaseName,
-					AksChart.ChartName,
-					settings.AksOperatorVersion.Get(),
-					"",
-					expectedValues,
-					gomock.AssignableToTypeOf(b),
-					"",
-				).Return(nil)
+				wantedCRD := chartpkg.DesiredState{
+					ReleaseNamespace: AksCrdChart.ReleaseNamespace,
+					ReleaseName:      AksCrdChart.ReleaseName,
+					ChartName:        AksCrdChart.ChartName,
+					MinVersion:       settings.AksOperatorVersion.Get(),
+					Values:           nil,
+				}
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: AksChart.ReleaseNamespace,
+					ReleaseName:      AksChart.ReleaseName,
+					ChartName:        AksChart.ChartName,
+					MinVersion:       settings.AksOperatorVersion.Get(),
+					Values:           expectedValues,
+				}
+				manager.EXPECT().Ensure(wantedCRD, gomock.AssignableToTypeOf(b), "").Return(nil)
+				manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(b), "").Return(nil)
 
 				return manager
 			},
@@ -150,26 +143,22 @@ func Test_handler_onClusterChange(t *testing.T) {
 				settings.AksOperatorVersion.Set(exactVersion)
 
 				var b bool
-				manager.EXPECT().Ensure(
-					AksCrdChart.ReleaseNamespace,
-					AksCrdChart.ReleaseName,
-					AksCrdChart.ChartName,
-					exactVersion,
-					"",
-					nil,
-					gomock.AssignableToTypeOf(b),
-					"",
-				).Return(nil)
-				manager.EXPECT().Ensure(
-					AksChart.ReleaseNamespace,
-					AksChart.ReleaseName,
-					AksChart.ChartName,
-					exactVersion,
-					"",
-					expectedValues,
-					gomock.AssignableToTypeOf(b),
-					"",
-				).Return(nil)
+				wantedCRD := chartpkg.DesiredState{
+					ReleaseNamespace: AksCrdChart.ReleaseNamespace,
+					ReleaseName:      AksCrdChart.ReleaseName,
+					ChartName:        AksCrdChart.ChartName,
+					MinVersion:       exactVersion,
+					Values:           nil,
+				}
+				wanted := chartpkg.DesiredState{
+					ReleaseNamespace: AksChart.ReleaseNamespace,
+					ReleaseName:      AksChart.ReleaseName,
+					ChartName:        AksChart.ChartName,
+					MinVersion:       exactVersion,
+					Values:           expectedValues,
+				}
+				manager.EXPECT().Ensure(wantedCRD, gomock.AssignableToTypeOf(b), "").Return(nil)
+				manager.EXPECT().Ensure(wanted, gomock.AssignableToTypeOf(b), "").Return(nil)
 
 				return manager
 			},

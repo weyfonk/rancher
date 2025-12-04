@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
+	chartpkg "github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/controllers/dashboard/chart"
 	controllerv3 "github.com/rancher/rancher/pkg/generated/controllers/management.cattle.io/v3"
 	"github.com/rancher/rancher/pkg/namespace"
@@ -114,15 +115,16 @@ func (h handler) onClusterChange(key string, cluster *v3.Cluster) (*v3.Cluster, 
 		return cluster, nil
 	}
 
-	if err := h.manager.Ensure(
-		toInstallCrdChart.ReleaseNamespace,
-		toInstallCrdChart.ChartName,
-		toInstallCrdChart.ReleaseName,
-		toInstallCrdChartVersion,
-		"",
-		nil,
-		true,
-		""); err != nil {
+	wantedCRDChart := chartpkg.DesiredState{
+		ReleaseNamespace: toInstallCrdChart.ReleaseNamespace,
+		ReleaseName:      toInstallCrdChart.ReleaseName,
+		ChartName:        toInstallCrdChart.ChartName,
+		MinVersion:       toInstallCrdChartVersion,
+		// Empty ExactVersion
+		// nil values
+	}
+
+	if err := h.manager.Ensure(wantedCRDChart, true, ""); err != nil {
 		return cluster, err
 	}
 
@@ -153,15 +155,16 @@ func (h handler) onClusterChange(key string, cluster *v3.Cluster) (*v3.Cluster, 
 		chartValues[priorityClassKey] = priorityClassName
 	}
 
-	if err := h.manager.Ensure(
-		toInstallChart.ReleaseNamespace,
-		toInstallChart.ChartName,
-		toInstallChart.ReleaseName,
-		toInstallChartVersion,
-		"",
-		chartValues,
-		true,
-		""); err != nil {
+	wantedChart := chartpkg.DesiredState{
+		ReleaseNamespace: toInstallChart.ReleaseNamespace,
+		ReleaseName:      toInstallChart.ReleaseName,
+		ChartName:        toInstallChart.ChartName,
+		MinVersion:       toInstallChartVersion,
+		// Empty ExactVersion
+		Values: chartValues,
+	}
+
+	if err := h.manager.Ensure(wantedChart, true, ""); err != nil {
 		return cluster, err
 	}
 

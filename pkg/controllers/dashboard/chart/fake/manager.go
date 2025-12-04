@@ -12,6 +12,7 @@ package fake
 import (
 	reflect "reflect"
 
+	chart "github.com/rancher/rancher/pkg/chart"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,17 +41,17 @@ func (m *MockManager) EXPECT() *MockManagerMockRecorder {
 }
 
 // Ensure mocks base method.
-func (m *MockManager) Ensure(namespace, chartName, releaseName, minVersion, exactVersion string, values map[string]any, takeOwnership bool, installImageOverride string) error {
+func (m *MockManager) Ensure(dsc chart.DesiredState, takeOwnership bool, installImageOverride string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Ensure", namespace, chartName, releaseName, minVersion, exactVersion, values, takeOwnership, installImageOverride)
+	ret := m.ctrl.Call(m, "Ensure", dsc, takeOwnership, installImageOverride)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Ensure indicates an expected call of Ensure.
-func (mr *MockManagerMockRecorder) Ensure(namespace, chartName, releaseName, minVersion, exactVersion, values, takeOwnership, installImageOverride any) *gomock.Call {
+func (mr *MockManagerMockRecorder) Ensure(dsc, takeOwnership, installImageOverride any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ensure", reflect.TypeOf((*MockManager)(nil).Ensure), namespace, chartName, releaseName, minVersion, exactVersion, values, takeOwnership, installImageOverride)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ensure", reflect.TypeOf((*MockManager)(nil).Ensure), dsc, takeOwnership, installImageOverride)
 }
 
 // Remove mocks base method.

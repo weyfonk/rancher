@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
+	chartpkg "github.com/rancher/rancher/pkg/chart"
 	"github.com/rancher/rancher/pkg/controllers/dashboard/chart"
 	"github.com/rancher/rancher/pkg/features"
 	fleetconst "github.com/rancher/rancher/pkg/fleet"
@@ -93,16 +94,18 @@ func (h *handler) onSetting(key string, setting *v3.Setting) (*v3.Setting, error
 		fleetVersion = fleetMinVersion
 	}
 
-	err := h.manager.Ensure(
-		fleetCRDChart.ReleaseNamespace,
-		fleetCRDChart.ChartName,
-		fleetCRDChart.ReleaseName,
-		fleetVersion,
-		"",
-		nil,
-		true,
-		"")
-	if err != nil {
+	wantedCRD := chartpkg.DesiredState{
+		ReleaseNamespace: fleetCRDChart.ReleaseNamespace,
+		ReleaseName:      fleetCRDChart.ReleaseName,
+		ChartName:        fleetCRDChart.ChartName,
+		MinVersion:       fleetVersion,
+		// Empty ExactVersion
+		// nil values
+	}
+
+	if err := h.manager.Ensure(wantedCRD, true, ""); err != nil {
+		h.Unlock()
+
 		return setting, err
 	}
 
@@ -149,14 +152,14 @@ func (h *handler) onSetting(key string, setting *v3.Setting) (*v3.Setting, error
 	}
 	fleetChartValues = data.MergeMaps(fleetChartValues, extraValues)
 
-	return setting,
-		h.manager.Ensure(
-			fleetChart.ReleaseNamespace,
-			fleetChart.ChartName,
-			fleetChart.ReleaseName,
-			fleetVersion,
-			"",
-			fleetChartValues,
-			true,
-			"")
+	wantedFleet := chartpkg.DesiredState{
+		ReleaseNamespace: fleetChart.ReleaseNamespace,
+		ReleaseName:      fleetChart.ReleaseName,
+		ChartName:        fleetChart.ChartName,
+		MinVersion:       fleetVersion,
+		// Empty ExactVersion
+		Values: fleetChartValues,
+	}
+
+	return setting, h.manager.Ensure(wantedFleet, true, "")
 }
