@@ -13,9 +13,7 @@ import (
 	"github.com/rancher/rancher/pkg/settings"
 	"github.com/rancher/rancher/pkg/wrangler"
 	"github.com/rancher/wrangler/v3/pkg/data"
-	"github.com/rancher/wrangler/v3/pkg/relatedresource"
 	"github.com/sirupsen/logrus"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 const priorityClassKey = "priorityClassName"
@@ -54,15 +52,7 @@ func Register(ctx context.Context, wContext *wrangler.Context) error {
 	}
 
 	wContext.Mgmt.Setting().OnChange(ctx, "fleet-install", h.onSetting)
-	// watch cluster repo `rancher-charts` and enqueue the setting to make sure the latest fleet is installed after catalog refresh
-	relatedresource.WatchClusterScoped(ctx, "bootstrap-fleet-charts", func(namespace, name string, obj runtime.Object) ([]relatedresource.Key, error) {
-		if name == "rancher-charts" {
-			return []relatedresource.Key{{
-				Name: settings.ServerURL.Name,
-			}}, nil
-		}
-		return nil, nil
-	}, wContext.Mgmt.Setting(), wContext.Catalog.ClusterRepo())
+
 	return nil
 }
 
